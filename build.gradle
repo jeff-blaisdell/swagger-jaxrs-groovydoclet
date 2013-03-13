@@ -8,12 +8,38 @@ version = '0.2.0'
 repositories {
     mavenLocal()
     mavenCentral()
+    maven {
+        name 'Bloom Artifactory'
+        url "${bloom_artifactory_contextUrl}/repo"
+    }
 }
 
 dependencies {
     compile 'org.codehaus.groovy:groovy-all:2.1.1'
-    compile(group: 'org.codehaus.groovy', name: 'enhanced-groovydoc', version: '0.6')
+    compile 'com.bloomhealthco:enhanced-groovydoc:0.6'
     compile 'org.codehaus.jackson:jackson-core-asl:1.9.9'
     compile 'org.codehaus.jackson:jackson-mapper-asl:1.9.9'
     compile 'javax.ws.rs:jsr311-api:1.1.1'
+}
+
+task sourcesJar(type: Jar) {
+    classifier = 'sources'
+    from sourceSets.main.allSource
+}
+
+artifacts {
+    archives sourcesJar
+}
+
+uploadArchives {
+    repositories {
+        mavenDeployer {
+            repository(url: "${bloom_artifactory_contextUrl}/libs-release-local") {
+                authentication(
+                        userName: bloom_artifactory_username,
+                        password: bloom_artifactory_password
+                )
+            }
+        }
+    }
 }
